@@ -1,0 +1,367 @@
+esphome:
+  name: REPLACEME
+  friendly_name: REPLACEME
+  on_boot:
+    priority: -100.0
+    then:
+      - light.turn_on:
+          id: onboard_led
+          brightness: 100%
+          red: 0%
+          green: 100%
+          blue: 0%
+          transition_length: 0s
+      - delay: 2s
+      - light.turn_off: onboard_led
+
+esp32:
+  board: esp32-s3-devkitc-1
+  variant: ESP32S3
+  framework:
+    type: esp-idf
+
+psram:
+  mode: quad
+  speed: 80MHz
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: "REPLACEME"
+
+ota:
+  - platform: esphome
+    password: "REPLACEME"
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  power_save_mode: NONE
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "REPLACEME"
+    password: "REPLACEME"
+
+captive_portal:
+
+time:
+  - platform: homeassistant
+    id: update_timer
+    on_time: 
+      - seconds: 0,10,20,30,40,50
+        minutes: /1
+        then:
+          - light.turn_on:
+              id: onboard_led
+              brightness: 100%
+              red: 0%
+              green: 0%
+              blue: 100%
+              transition_length: 0s
+          - component.update: scale_one_raw
+          - light.turn_off: onboard_led
+      - seconds: 2,12,22,32,42,52
+        minutes: /1
+        then:
+          - light.turn_on:
+              id: onboard_led
+              brightness: 100%
+              red: 0%
+              green: 0%
+              blue: 100%
+              transition_length: 0s
+          - component.update: scale_two_raw
+          - light.turn_off: onboard_led
+      - seconds: 4,14,24,34,44,54
+        minutes: /1
+        then:
+          - light.turn_on:
+              id: onboard_led
+              brightness: 100%
+              red: 0%
+              green: 0%
+              blue: 100%
+              transition_length: 0s
+          - component.update: scale_three_raw
+          - light.turn_off: onboard_led
+      - seconds: 6,16,26,36,46,56
+        minutes: /1
+        then:
+          - light.turn_on:
+              id: onboard_led
+              brightness: 100%
+              red: 0%
+              green: 0%
+              blue: 100%
+              transition_length: 0s
+          - component.update: scale_four_raw
+          - light.turn_off: onboard_led
+      - seconds: 8,18,28,38,48,58
+        minutes: /1
+        then:
+          - light.turn_on:
+              id: onboard_led
+              brightness: 100%
+              red: 0%
+              green: 0%
+              blue: 100%
+              transition_length: 0s
+          - component.update: scale_co2_raw
+          - light.turn_off: onboard_led
+
+light:
+  - platform: esp32_rmt_led_strip
+    rgb_order: GRB
+    pin: 48
+    num_leds: 1
+    rmt_channel: 0
+    chipset: WS2812
+    name: "Onboard LED"
+    id: onboard_led
+    
+#####################
+# Beer Drain Sensor #
+#####################
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: 9
+      inverted: true
+      mode:
+        input: true
+        pullup: true
+    id: beer_drain_full
+    name: "Beer Drain Full"
+
+###############################
+# Scales and Pressure Sensors #
+###############################
+sensor:
+  ######################
+  # Diagnostic Sensors #
+  ######################
+  - platform: wifi_signal
+    name: "WiFi Signal dB"
+    id: wifi_signal_db
+    update_interval: 60s
+    entity_category: "diagnostic"
+    unit_of_measurement: dBm
+  - platform: copy
+    source_id: wifi_signal_db
+    name: "WiFi Signal Strength"
+    id: wifi_signal_strength
+    filters:
+      - lambda: return (((90.0 - abs(x)) / 60.0) * 100.0);
+    unit_of_measurement: "Signal %"
+    entity_category: "diagnostic"
+  #########
+  # Keg 1 #
+  #########
+  - platform: homeassistant
+    entity_id: input_number.keg_1_tare_kg
+    id: keg_1_tare_kg
+    name: "Keg 1 Tare (Kg)"
+    internal: True
+    accuracy_decimals: 3
+  - platform: hx711
+    clk_pin: 5
+    dout_pin: 4
+    gain: 64
+    filters:
+      - median: 
+          window_size: 3
+          send_every: 3
+          send_first_at: 3  
+    id: scale_one_raw
+    update_interval: never
+    name: "Scale One Raw"
+  - platform: copy
+    source_id: scale_one_raw
+    unit_of_measurement: kg
+    filters:
+      - calibrate_linear:
+        - 49135 -> 0.0
+        - -83849 -> 10.002
+      - lambda: return x - id(keg_1_tare_kg).state;
+    accuracy_decimals: 2
+    id: scale_one_kg
+    name: "Scale One Kg"
+  - platform: copy
+    source_id: scale_one_kg
+    unit_of_measurement: Oz
+    filters:
+      - multiply: 33.814
+    id: scale_one_oz
+    name: "Scale One Remaining Beer (Oz)"
+  #########
+  # Keg 2 #
+  #########
+  - platform: homeassistant
+    entity_id: input_number.keg_2_tare_kg
+    id: keg_2_tare_kg
+    name: "Keg 2 Tare (Kg)"
+    internal: True
+    accuracy_decimals: 3
+  - platform: hx711
+    clk_pin: 7
+    dout_pin: 6
+    gain: 64
+    filters:
+      - median: 
+          window_size: 3
+          send_every: 3
+          send_first_at: 3  
+    id: scale_two_raw
+    update_interval: never
+    name: "Scale Two Raw"
+  - platform: copy
+    source_id: scale_two_raw
+    unit_of_measurement: kg
+    filters:
+      - calibrate_linear:
+        - -33834 -> 0.0
+        - 115053 -> 10.002
+      - lambda: return x - id(keg_2_tare_kg).state;
+    accuracy_decimals: 2
+    id: scale_two_kg
+    name: "Scale Two Kg"
+  - platform: copy
+    source_id: scale_two_kg
+    unit_of_measurement: Oz
+    filters:
+      - multiply: 33.814
+    id: scale_two_oz
+    name: "Scale Two Remaining Beer (Oz)"
+  #########
+  # Keg 3 #
+  #########
+  - platform: homeassistant
+    entity_id: input_number.keg_3_tare_kg
+    id: keg_3_tare_kg
+    name: "Keg 3 Tare (Kg)"
+    internal: True
+    accuracy_decimals: 3
+  - platform: hx711
+    clk_pin: 16
+    dout_pin: 15
+    gain: 64
+    filters:
+      - median: 
+          window_size: 3
+          send_every: 3
+          send_first_at: 3  
+    id: scale_three_raw
+    update_interval: never
+    name: "Scale Three Raw"
+  - platform: copy
+    source_id: scale_three_raw
+    unit_of_measurement: kg
+    filters:
+      - calibrate_linear:
+        - 281137 -> 0.0
+        - 425363 -> 10.002
+      - lambda: return x - id(keg_3_tare_kg).state;
+    accuracy_decimals: 2
+    id: scale_three_kg
+    name: "Scale Three Kg"
+  - platform: copy
+    source_id: scale_three_kg
+    unit_of_measurement: Oz
+    filters:
+      - multiply: 33.814
+    id: scale_three_oz
+    name: "Scale Three Remaining Beer (Oz)"
+  #########
+  # Keg 4 #
+  #########
+  - platform: homeassistant
+    entity_id: input_number.keg_4_tare_kg
+    id: keg_4_tare_kg
+    name: "Keg 4 Tare (Kg)"
+    internal: True
+    accuracy_decimals: 3
+  - platform: hx711
+    clk_pin: 18
+    dout_pin: 17
+    gain: 64
+    filters:
+      - median: 
+          window_size: 3
+          send_every: 3
+          send_first_at: 3  
+    id: scale_four_raw
+    update_interval: never
+    name: "Scale Four Raw"
+  - platform: copy
+    source_id: scale_four_raw
+    unit_of_measurement: kg
+    filters:
+      - calibrate_linear:
+        - -140124 -> 0.0
+        - -286031 -> 10.002
+      - lambda: return x - id(keg_4_tare_kg).state;
+    accuracy_decimals: 2
+    id: scale_four_kg
+    name: "Scale Four Kg"
+  - platform: copy
+    source_id: scale_four_kg
+    unit_of_measurement: Oz
+    filters:
+      - multiply: 33.814
+    id: scale_four_oz
+    name: "Scale Four Remaining Beer (Oz)"
+  ############
+  # CO2 Tank #
+  ############
+  - platform: homeassistant
+    entity_id: input_number.co2_tank_tare_kg
+    id: co2_tank_tare_kg
+    name: "Keg 4 Tare (Kg)"
+    internal: True
+    accuracy_decimals: 3
+  - platform: hx711
+    clk_pin: 12
+    dout_pin: 11
+    gain: 64
+    filters:
+      - median: 
+          window_size: 3
+          send_every: 3
+          send_first_at: 3  
+    id: scale_co2_raw
+    update_interval: never
+    name: "Scale CO2 Raw"
+  - platform: copy
+    source_id: scale_co2_raw
+    unit_of_measurement: kg
+    filters:
+      - calibrate_linear:
+        - -192792 -> 0.0
+        - -499157 -> 5.841
+      - lambda: return x - id(co2_tank_tare_kg).state;
+    accuracy_decimals: 2
+    id: scale_co2_kg
+    name: "Scale CO2 Kg"
+  ################
+  # CO2 Pressure #
+  ################]
+  - platform: adc
+    pin: 10
+    attenuation: 11db
+    id: co2_pressure_raw
+    accuracy_decimals: 4
+    update_interval: 60s
+  - platform: copy
+    source_id: co2_pressure_raw
+    id: co2_pressure
+    name: "CO2 Pressure"
+    unit_of_measurement: "PSI"
+    accuracy_decimals: 2
+    filters:
+      - calibrate_linear:
+        - 2.689 -> 28
+        - 0.3 -> 0
