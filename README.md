@@ -148,8 +148,8 @@ There's a few "phases" to get the device up and running with Home Assistant.
 
     The important part is to update the framework to use esp-idf instead of arduino.  
 
-    > [!CAUTION]
-    > Note, that the above assumes that the board is the exact same one in the BoM.  If it's different, confirm the settings and adjust as nessecary.  The psram section may need to be altered or ommitted entirely.
+> [!CAUTION]
+> Note, that the above assumes that the board is the exact same one in the BoM.  If it's different, confirm the settings and adjust as nessecary.  The psram section may need to be altered or ommitted entirely.
 
 7. Upload the first batch of firmware and make sure the device returns logs.
 8. Edit the yaml again and add the following after the `captive_portal:` section.
@@ -423,8 +423,8 @@ There's a few "phases" to get the device up and running with Home Assistant.
         name: "Scale Four Remaining Beer (Oz)"
     ```
 
-    > [!NOTE]
-    > You can name the helpers in step 2 whatever you like.  Be sure to update the yaml file with the correct device id of the helpers that you create.
+> [!NOTE]
+> You can name the helpers in step 2 whatever you like.  Be sure to update the yaml file with the correct device id of the helpers that you create.
 
 9. Upload the new firmware and watch the logs.  The scales should all be connected and should start reporting values.
 10. Allow each sensor to rest for a bit with no weight on the scale.  Go to Settings -> Devices -> ESPHome -> <Your Device>.  View the raw values for each scale and note the current values.  Depending on the gain, you may need to take a median or average of a few readings.
