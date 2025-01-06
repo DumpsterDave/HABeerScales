@@ -76,9 +76,8 @@ The quantities of parts listed below is for 4 keg scales and the controller.  It
 |||||||
 |**Subtotal:**|||||**$269.44**|
 
-*Notes:*
-
-Some of these items have volume discounts that may not be reflected in the above list.  For the Harwin M20 connectors, people may opt to use generic dupont clones that you can find on any mass retail site.  Using generic connectors can bring your costs down a little bit and give you plenty of spares, however I personaly prefer to get genuine parts when I can.  I do not recommend that you purchase the Meanwell power supply or power inlet off of Amazon due to the high rate of fakes.  The ones that I've seen sell for pretty much the same price, so it's best to get those from a reputable source like Digikey or Mouser.  You can get a large pack of screws from Amazon as well.  I find the socket formation on their screws to be a bit suspect at times, but they should suffice for our purposes.
+> [!NOTE]
+> Some of these items have volume discounts that may not be reflected in the above list.  For the Harwin M20 connectors, people may opt to use generic dupont clones that you can find on any mass retail site.  Using generic connectors can bring your costs down a little bit and give you plenty of spares, however I personaly prefer to get genuine parts when I can.  I do not recommend that you purchase the Meanwell power supply or power inlet off of Amazon due to the high rate of fakes.  The ones that I've seen sell for pretty much the same price, so it's best to get those from a reputable source like Digikey or Mouser.  You can get a large pack of screws from Amazon as well.  I find the socket formation on their screws to be a bit suspect at times, but they should suffice for our purposes.
 
 If you can find other people that want scales, your per-part price from Send-Cut-Send can come down considerably.  For example, when going from 4 scales to 8, the unit price drops by $4 to 23.29.  The more people you get in on the purchase, the cheaper the indiviual pieces will be and you can split up some of the bulk items like screws and such.  Another alternative is to 3D print scale tops.  For my prototype, I printed a 6MM thick plate out of ABS.  It held up perfectly fine with a standard corny keg.  Using 3D printed scale tops can drop your per-scale cost down to almost nothing and really bring the project cost down.  Plastic does flex though, so I cannot say how a 3D printed top might hold up over the long run.
 
@@ -449,4 +448,3 @@ There's a few "phases" to get the device up and running with Home Assistant.
 14. They can also now be used to feed other things such as live updating tap handles:
 
     ![Connected Tap Handles](images/tap-handles.png)
-    
